@@ -926,6 +926,7 @@ void SessionChat::begin(const std::string& peer, bool incoming, int bandwidth, u
     hello.acceptsSessions = settings_.acceptsSessions;
     hello.locator = settings_.locator;
     hello.software = settings_.software;
+    hello.takes = settings_.takes;
     write(protocol::streamOpening(numbering_.record(hello, seconds(nowMs))), nowMs);
 
     // Late bytes of the last session made the reader give up: start clean.

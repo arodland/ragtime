@@ -282,7 +282,18 @@ void testMessageBothWays()
     CHECK(heardHello(b));
     s = b.stations.find("TEST1");
     CHECK(s != nullptr && s->locator == "CN88");
+    CHECK(s != nullptr && s->takes == protocol::TAKES_ALL_V0);
     CHECK_EQ(a.chat.newestItem(), (uint32_t)4);
+
+    // So does a change of what it takes: a client with fewer features says so.
+    b.heard.clear();
+    settings.takes = protocol::TAKES_TEXT | protocol::TAKES_STATUS;
+    a.chat.setSettings(settings, a.chat.newestItem());
+    a.chat.send("text only", "", now);
+    settle(a, b);
+    CHECK(heardHello(b));
+    s = b.stations.find("TEST1");
+    CHECK(s != nullptr && s->takes == (protocol::TAKES_TEXT | protocol::TAKES_STATUS));
 }
 
 void testAddressedAndAcknowledged()

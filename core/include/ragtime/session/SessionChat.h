@@ -261,6 +261,9 @@ public:
         std::string locator;
         bool acceptsSessions = true;
         std::string software;       // "Ragtime 0.1.0"
+        // What our Hello says we take (protocol::Takes): a client with fewer
+        // features than Ragtime says so, and a peer offers it only those.
+        uint8_t takes = protocol::TAKES_ALL_V0;
     };
 
     // The host calls five times.

@@ -278,6 +278,7 @@ void testCallingAndTheOpening()
         CHECK_EQ(ours[0].header.seq, (uint32_t)0);
         CHECK_EQ(ours[0].as<protocol::Hello>()->locator, std::string("CN87"));
         CHECK_EQ(ours[0].as<protocol::Hello>()->software, std::string("Ragtime test"));
+        CHECK_EQ(ours[0].as<protocol::Hello>()->takes, (uint8_t)protocol::TAKES_ALL_V0);
     }
     std::string strip = rig.chat.strip(rig.now).text;
     CHECK(contains(strip, "Connected to W1AW"));
