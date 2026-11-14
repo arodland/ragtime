@@ -12,6 +12,7 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <map>
 #include <optional>
 #include <string>
 #include <vector>
@@ -102,6 +103,10 @@ struct ModeInfo
     int maxCodewords = 0;
     double secondsAtOne = 0.0;
     double secondsAtMax = 0.0;
+    // S/N thresholds from hosts since Data2G PR #186: per channel name
+    // ("awgn", "mpg", "mpp", "mpd"), the 10% codeword failure S/N in dB,
+    // none where the mode never got there. Empty from an older host.
+    std::map<std::string, std::optional<double>> thresholds;
 
     bool valid() const { return !name.empty() && bytesPerCodeword > 0 && maxCodewords > 0; }
 
@@ -192,6 +197,8 @@ struct CommandEvent
         Busy,           // on
         Mode,           // text: the submode a burst went out in
         ModeLine,       // modeInfo: one line of the MODES list
+        Channels,       // words: the THRESHOLD lines' columns (Data2G PR #186)
+        ModeThreshold,  // text: mode, dBs: one per channel, none for "-"
         BcastPort,      // number: the port BCAST OPEN gave
         BcastHeard,     // number, text: the sender's call when sent with FROM, snr
         BcastLost,      // number, count
@@ -228,6 +235,8 @@ struct CommandEvent
     double value = 0.0;
     HandRef handRef;
     uint64_t handPayload = 0;
+    std::vector<std::string> words;
+    std::vector<std::optional<double>> dBs;
 
     // Why a session ended (Data2G PR #122, with DATA2G ON): "DISCONNECTED
     // reason [detail] [unconfirmed]". The reason is one word: CLIENT (our

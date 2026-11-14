@@ -1007,6 +1007,14 @@ void MainFrame::onHostEvents(const std::vector<Event>& events)
                     h.widthHz = m.bandwidthHz;
                     h.bitsPerSecond = gearbox::payloadBitsPerSecond(m.bytesPerCodeword, m.maxCodewords,
                                                                     m.secondsAtOne, m.secondsAtMax);
+                    for (const auto& [channel, dB] : m.thresholds)
+                    {
+                        if (std::optional<gearbox::Path> path = gearbox::pathFromKey(channel))
+                        {
+                            h.threshold[static_cast<int>(*path)] = dB;
+                            h.hasThresholds = true;
+                        }
+                    }
                     modes.push_back(h);
                 }
                 gearshift_.setHostModes(std::move(modes));

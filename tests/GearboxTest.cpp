@@ -425,11 +425,11 @@ void testGearshift()
 
     // Only what the host offers, with the host's own figures.
     shift.selectGear(2);
-    HostMode fsk1{"p-fsk-1", 500, 31.0, {}};
-    HostMode qpsk1{"p-qpsk-1", 1200, 0.0, {}};  // no airtimes: the file's speed stands
-    HostMode qam16{"p-16qam", 2300, 390.0, {}};
+    HostMode fsk1{"p-fsk-1", 500, 31.0, {}, false};
+    HostMode qpsk1{"p-qpsk-1", 1200, 0.0, {}, false};  // no airtimes: the file's speed stands
+    HostMode qam16{"p-16qam", 2300, 390.0, {}, false};
     qam16.threshold[static_cast<int>(Path::Calm)] = -1.0;
-    HostMode control{"n4-ack-1", 200, 5000.0, {}};
+    HostMode control{"n4-ack-1", 200, 5000.0, {}, false};
     shift.setHostModes({fsk1, qpsk1, qam16, control});
     CHECK_EQ(names(shift.ladder()), std::string("p-fsk-1 p-qpsk-1 p-16qam"));
     CHECK_EQ(shift.usable().modes().size(), 3u);
@@ -444,6 +444,17 @@ void testGearshift()
     CHECK_EQ(shift.shortName("p-fsk-2"), std::string("A40"));
     // The table itself keeps the file's figures.
     CHECK_EQ(shift.table().find("p-16qam")->bitsPerSecond, 400.0);
+    CHECK(!shift.hostThresholds());
+    // Thresholds in MODES (Data2G PR #186) win over the file's, "never"
+    // included.
+    HostMode given = qam16;
+    given.hasThresholds = true;
+    HostMode never = fsk1;
+    never.hasThresholds = true;
+    shift.setHostModes({given, never, qpsk1});
+    CHECK(shift.hostThresholds());
+    CHECK_EQ(names(shift.ladder()), std::string("p-qpsk-1 p-16qam"));
+    CHECK(!shift.usable().find("p-16qam")->thresholdOn(Path::Good));
     shift.setHostModes({});
     CHECK_EQ(shift.ladder().size(), 4u);
 

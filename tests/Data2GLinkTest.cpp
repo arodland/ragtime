@@ -88,6 +88,14 @@ void testCommandLines()
     CHECK(parseCommandLine("MODE qpsk-r1/3 wide 76 64 1.78 74.36").type == Type::Other);
     CHECK(parseCommandLine("BUFFER lots").type == Type::Other);
 
+    // Thresholds in MODES, from hosts since Data2G PR #186.
+    e = parseCommandLine("CHANNELS awgn mpg mpp mpd");
+    CHECK(e.type == Type::Channels && e.words == std::vector<std::string>({"awgn", "mpg", "mpp", "mpd"}));
+    e = parseCommandLine("THRESHOLD qpsk-r1/3 -4.5 -1.25 - 3");
+    CHECK(e.type == Type::ModeThreshold && e.text == "qpsk-r1/3" && e.dBs.size() == 4 && e.dBs[0] == -4.5 &&
+          !e.dBs[2] && e.dBs[3] == 3.0);
+    CHECK(parseCommandLine("THRESHOLD qpsk-r1/3 loud").type == Type::Other);
+
     // SNRs, from hosts since Data2G PR #98: the last word of HEARD (a
     // callsign always has a letter), and of MISSED once the noise floor
     // is known. A HEARD without one, as before, has none.

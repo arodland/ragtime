@@ -417,7 +417,8 @@ private:
     std::vector<Event> events_;
 
     // Answers we wait for, oldest first: "OK" (OK or WRONG), "BCAST PORT"
-    // or "MODES" (MODE lines, then OK).
+    // or "MODES" (MODE lines, CHANNELS and THRESHOLD lines from hosts since
+    // Data2G PR #186, then OK).
     struct Awaiting
     {
         std::string command;
@@ -430,6 +431,7 @@ private:
     std::optional<HandRef> kissRef_;    // the burst the KISS port's next frames came in
     bool handsSeen_ = false;            // a REF since the command port came up
     std::vector<ModeInfo> modesComing_;
+    std::vector<std::string> channelsComing_;  // the MODES answer's CHANNELS
 
     int groupPort_ = -1;
     std::string groupMode_;

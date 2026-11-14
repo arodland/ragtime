@@ -98,10 +98,11 @@ int columnWidth(const wxWindow* list, int drawn, const wxString& text)
 
 // Why there are no gears to draw, or empty when there are: no thresholds
 // found at all, or thresholds with no widths and speeds yet (data2g-host's
-// own file has none; its MODES list gives them).
+// own file has none; its MODES list gives them). A host since Data2G PR
+// #186 gives the thresholds too, so no file is asked for.
 wxString whyNoGears(const Gearshift& shift)
 {
-    if (shift.table().empty())
+    if (shift.table().empty() && !shift.hostThresholds())
     {
         return "No thresholds found. Ragtime looks for Data2G's own\n"
                "data2g/codes_data/mode_thresholds.json in a Data2G checkout\n"
@@ -841,10 +842,10 @@ GearshiftDialog::GearshiftDialog(wxWindow* owner, bool onTop, Gearshift& shift, 
     source_ = new wxStaticText(panel, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
                                wxST_ELLIPSIZE_MIDDLE);
     foot->Add(source_, 1, wxALIGN_CENTER_VERTICAL | wxRIGHT, 10);
-    auto* load = new wxButton(panel, wxID_ANY, "Load thresholds...");
-    load->SetToolTip("Data2G's data2g/codes_data/mode_thresholds.json, or the Submode Map's file");
-    load->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { loadFile(); });
-    foot->Add(load, 0, wxRIGHT, 6);
+    load_ = new wxButton(panel, wxID_ANY, "Load thresholds...");
+    load_->SetToolTip("Data2G's data2g/codes_data/mode_thresholds.json, or the Submode Map's file");
+    load_->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { loadFile(); });
+    foot->Add(load_, 0, wxRIGHT, 6);
     // Done with a green check, not "X Close": every change has already
     // gone to the gearshift, so there is nothing to save or cancel (Jeff,
     // 2026-10-25: "X Close implies that you cancel something").
@@ -1012,14 +1013,20 @@ void GearshiftDialog::refresh()
 
     const wxArrayString sources = loadedThresholdSources();
     const int count = static_cast<int>(shift_.table().modes().size());
-    if (shift_.table().empty())
+    if (load_->Show(!shift_.hostThresholds()))
+        load_->GetContainingSizer()->Layout();
+    if (shift_.hostThresholds())
+        source_->SetLabel(wxString::Format("Thresholds from data2g-host (%d modes)",
+                                           static_cast<int>(shift_.usable().modes().size())));
+    else if (shift_.table().empty())
         source_->SetLabel("No thresholds found");
     else if (sources.empty())
         source_->SetLabel(wxString::Format("Thresholds for %d modes", count));
     else
         source_->SetLabel(wxString::Format("Thresholds from %s (%d modes)",
                                            wxJoin(sources, ';', '\0'), count));
-    source_->SetToolTip(sources.empty()
+    source_->SetToolTip(shift_.hostThresholds() ? wxString("From data2g-host's MODES list")
+                        : sources.empty()
                             ? "Looked in " + wxJoin(data2gSearchFolders(), ',', '\0')
                             : wxJoin(sources, '\n', '\0'));
 

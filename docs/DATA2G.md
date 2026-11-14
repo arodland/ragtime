@@ -65,7 +65,7 @@ Python host needs only numpy and scipy; torch is for training.
 | `VERSION` | `VERSION Data2G x.y.z` | |
 | `BCAST OPEN D2G FROM call` | `BCAST PORT n` | A KISS port for the group, each burst naming the sender |
 | `BCAST MODE n mode` | `OK` / `WRONG` | The port's transmit mode (below) |
-| `MODES` | `MODE ...` lines, then `OK` | `MODE name width-Hz bytes-per-codeword max-codewords seconds-at-1 seconds-at-max`, narrowest first |
+| `MODES` | `MODE ...` lines, then `OK` | `MODE name width-Hz bytes-per-codeword max-codewords seconds-at-1 seconds-at-max`, narrowest first. Since PR #186, `CHANNELS awgn mpg mpp mpd` and one `THRESHOLD name dB...` per mode (same order, `-` for never reached) follow before `OK` |
 
 Reports: `CONNECTED src dst bw`, `DISCONNECTED [reason [detail]]`
 (below), `PTT ON|OFF`,
@@ -100,8 +100,9 @@ At 13807c6 `MODES` lists 50 modes at `--kiss-bw 2400` (22 at 500): 200 Hz
 `w48-*`. The polar modes (`polar-k96-f4`, `polar-k96-f8`,
 `polar-k192-f8`, 10 and 22 bytes a codeword) are data modes that
 `BCAST MODE` takes. The `ack-*` modes carry 4 bytes a codeword and are
-for session acknowledgements. `MODES` carries no S/N thresholds; those
-are in `data2g/codes_data/mode_thresholds.json` (GEARBOX.md).
+for session acknowledgements. Since PR #186 `MODES` carries the S/N
+thresholds of `data2g/codes_data/mode_thresholds.json` (GEARBOX.md);
+an older host doesn't, and the gearshift falls back on the file.
 
 ## A broadcast burst
 
@@ -298,7 +299,6 @@ payload, which Jeff has decided for Ragtime (2026-11-08).
 - `TXPOWER` back to the station's own level when the client goes, as
   `TIMEOUT` is (asked in the PR #122 review), so a Ragtime that quits
   doesn't leave the next client a level it set.
-- S/N thresholds in `MODES`.
 - The mode on `BCAST HEARD` (the path log's mode column).
 - A dial report from the host's own rig control.
 - A 200 Hz session cap.

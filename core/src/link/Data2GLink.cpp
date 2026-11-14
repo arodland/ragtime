@@ -219,19 +219,19 @@ const std::vector<ModeInfo>& knownModes()
     // From a 2400 Hz data2g-host's MODES (Data2G 8ffe15c, 2026-10-07, as
     // Glissando measured them).
     static const std::vector<ModeInfo> modes = {
-        {"n4-qpsk-r1/5", 200, 22, 32, 4.14, 111.27},
-        {"fsk16r25-r1/2", 500, 58, 9, 4.98, 89.22},
-        {"fsk16r25-r1/3", 500, 38, 9, 4.98, 89.22},
-        {"fsk8r50-r1/2", 500, 58, 9, 3.62, 59.62},
-        {"fsk8r50-r1/3", 500, 38, 9, 3.62, 59.62},
-        {"n10-16qam-r1/2", 500, 121, 32, 2.12, 46.76},
-        {"n10-qpsk-r1/2", 500, 60, 32, 2.12, 46.76},
-        {"n10-qpsk-r1/3", 500, 40, 32, 2.12, 46.76},
-        {"n10-qpsk-r1/5", 500, 23, 32, 2.12, 46.76},
-        {"qpsk-r1/3", 1200, 76, 64, 1.78, 74.36},
-        {"fsk32r62-r1/3", 2300, 38, 9, 2.42, 29.30},
-        {"w48-16qam-r1/2", 2400, 236, 64, 1.21, 37.50},
-        {"w48-qpsk-r1/2", 2400, 116, 64, 1.21, 37.50},
+        {"n4-qpsk-r1/5", 200, 22, 32, 4.14, 111.27, {}},
+        {"fsk16r25-r1/2", 500, 58, 9, 4.98, 89.22, {}},
+        {"fsk16r25-r1/3", 500, 38, 9, 4.98, 89.22, {}},
+        {"fsk8r50-r1/2", 500, 58, 9, 3.62, 59.62, {}},
+        {"fsk8r50-r1/3", 500, 38, 9, 3.62, 59.62, {}},
+        {"n10-16qam-r1/2", 500, 121, 32, 2.12, 46.76, {}},
+        {"n10-qpsk-r1/2", 500, 60, 32, 2.12, 46.76, {}},
+        {"n10-qpsk-r1/3", 500, 40, 32, 2.12, 46.76, {}},
+        {"n10-qpsk-r1/5", 500, 23, 32, 2.12, 46.76, {}},
+        {"qpsk-r1/3", 1200, 76, 64, 1.78, 74.36, {}},
+        {"fsk32r62-r1/3", 2300, 38, 9, 2.42, 29.30, {}},
+        {"w48-16qam-r1/2", 2400, 236, 64, 1.21, 37.50, {}},
+        {"w48-qpsk-r1/2", 2400, 116, 64, 1.21, 37.50, {}},
     };
     return modes;
 }
@@ -352,6 +352,26 @@ CommandEvent parseCommandLine(const std::string& line)
             event.type = CommandEvent::Type::ModeLine;
             event.modeInfo = mode;
         }
+    }
+    else if (verb == "CHANNELS" && w.size() > 1)
+    {
+        event.type = CommandEvent::Type::Channels;
+        event.words.assign(w.begin() + 1, w.end());
+    }
+    else if (verb == "THRESHOLD" && w.size() > 2)
+    {
+        event.text = w[1];
+        for (size_t i = 2; i < w.size(); i++)
+        {
+            double dB = 0.0;
+            if (w[i] == "-")
+                event.dBs.push_back(std::nullopt);
+            else if (toDouble(w[i], dB))
+                event.dBs.push_back(dB);
+            else
+                return event;
+        }
+        event.type = CommandEvent::Type::ModeThreshold;
     }
     else if (verb == "BCAST" && w.size() == 3 && arg1 == "PORT" && toInt(w[2], event.number))
     {

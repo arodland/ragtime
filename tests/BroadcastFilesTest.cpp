@@ -343,9 +343,9 @@ void testAirtime()
     CHECK_EQ(broadcast::pieceFrameBytes(fsk), 3 * 38 - 3);
     // Framed, a piece never spills into a codeword more: two 128-byte
     // codewords hold 253 bytes (256 framed), three 86-byte ones 254 (258).
-    link::ModeInfo m128{"m128", 2400, 128, 32, 1.0, 10.0};
-    link::ModeInfo m86{"m86", 2400, 86, 32, 1.0, 10.0};
-    link::ModeInfo m278{"m278", 2400, 278, 32, 1.0, 10.0};
+    link::ModeInfo m128{"m128", 2400, 128, 32, 1.0, 10.0, {}};
+    link::ModeInfo m86{"m86", 2400, 86, 32, 1.0, 10.0, {}};
+    link::ModeInfo m278{"m278", 2400, 278, 32, 1.0, 10.0, {}};
     CHECK_EQ(broadcast::pieceFrameBytes(m128), 253);
     CHECK_EQ(broadcast::pieceFrameBytes(m86), 254);
     CHECK_EQ(broadcast::pieceFrameBytes(m278), (int)protocol::MAX_BROADCAST_FRAME);

@@ -283,6 +283,12 @@ void Gearshift::setHostModes(std::vector<HostMode> modes)
     rebuild();
 }
 
+bool Gearshift::hostThresholds() const
+{
+    return std::any_of(hostModes_.begin(), hostModes_.end(),
+                       [](const HostMode& mode) { return mode.hasThresholds; });
+}
+
 void Gearshift::setWidth(Width width)
 {
     width_ = width;
@@ -377,7 +383,8 @@ void Gearshift::rebuild()
             withHost.setFacts(mode.name, mode.widthHz, mode.bitsPerSecond);
         for (Path path : ALL_PATHS)
         {
-            if (std::optional<double> dB = mode.threshold[static_cast<int>(path)])
+            const std::optional<double> dB = mode.threshold[static_cast<int>(path)];
+            if (dB || mode.hasThresholds)
                 withHost.setThreshold(mode.name, path, dB);
         }
     }

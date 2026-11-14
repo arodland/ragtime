@@ -129,13 +129,14 @@ private:
 
 // A mode in data2g-host's MODES list, as the gearshift needs it. The host's
 // width and speed win over a file's; so do its thresholds, when MODES
-// carries them.
+// carries them (Data2G PR #186), "never" included.
 struct HostMode
 {
     std::string name;
     int widthHz = 0;
     double bitsPerSecond = 0.0;  // payloadBitsPerSecond() of its airtimes
     std::array<std::optional<double>, PATH_COUNT> threshold;
+    bool hasThresholds = false;  // MODES gave thresholds, so none means never
 };
 
 // The gearshift's state: width, path, Auto, and the gear in effect. The
@@ -158,6 +159,8 @@ public:
     // The table with the host's figures, cut to what it offers: what the
     // map draws.
     const SubmodeTable& usable() const { return usable_; }
+    // data2g-host's MODES gave thresholds: no file is needed.
+    bool hostThresholds() const;
 
     void setWidth(Width width);
     Width width() const { return width_; }

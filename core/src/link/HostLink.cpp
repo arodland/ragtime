@@ -89,6 +89,7 @@ void HostLink::commandDown(uint64_t nowMs)
     kissRef_.reset();
     handsSeen_ = false;
     modesComing_.clear();
+    channelsComing_.clear();
     if (groupPort_ >= 0)
     {
         groupPort_ = -1;
@@ -326,6 +327,7 @@ void HostLink::onLine(const std::string& line, uint64_t nowMs)
             {
                 modes_ = modesComing_;
                 modesComing_.clear();
+                channelsComing_.clear();
                 Event e;
                 e.type = Event::Type::ModesChanged;
                 emit(e);
@@ -359,6 +361,18 @@ void HostLink::onLine(const std::string& line, uint64_t nowMs)
         }
         case Type::ModeLine:
             if (!awaiting_.empty() && awaiting_.front().answer == MODES) modesComing_.push_back(c.modeInfo);
+            break;
+        case Type::Channels:
+            if (!awaiting_.empty() && awaiting_.front().answer == MODES) channelsComing_ = c.words;
+            break;
+        case Type::ModeThreshold:
+            if (awaiting_.empty() || awaiting_.front().answer != MODES || c.dBs.size() != channelsComing_.size())
+                break;
+            for (ModeInfo& m : modesComing_)
+            {
+                if (m.name != c.text) continue;
+                for (size_t i = 0; i < c.dBs.size(); i++) m.thresholds[channelsComing_[i]] = c.dBs[i];
+            }
             break;
         case Type::Ptt:
         case Type::Busy:

@@ -12,6 +12,7 @@
 
 #include "ragtime/gearbox/Gearbox.h"
 
+class wxButton;
 class wxCheckBox;
 class wxChoice;
 class wxListCtrl;
@@ -76,6 +77,7 @@ private:
     wxChoice* anyMode_ = nullptr;
     std::vector<std::string> anyModes_;  // anyMode_'s modes, by row
     wxStaticText* source_ = nullptr;
+    wxButton* load_ = nullptr;  // hidden while data2g-host gives thresholds
 };
 
 #endif

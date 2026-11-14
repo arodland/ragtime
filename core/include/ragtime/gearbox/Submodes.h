@@ -6,8 +6,8 @@
 // figures is Jeff's call. The table is read from a file, either the
 // Submode Map's JSON or data2g-host's own codes_data/mode_thresholds.json,
 // which every operator running data2g-host already has. Widths and speeds
-// also come from the host's MODES list, and its thresholds too once MODES
-// carries them (an ask for Andrew).
+// also come from the host's MODES list, and its thresholds too from hosts
+// since Data2G PR #186.
 #ifndef RAGTIME_GEARBOX_SUBMODES_H
 #define RAGTIME_GEARBOX_SUBMODES_H
 

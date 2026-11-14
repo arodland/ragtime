@@ -125,6 +125,17 @@ void testTheOpening()
     std::vector<HostLink::Event> events = link.takeEvents();
     CHECK(hasEvent(events, Type::GroupOpen));
     CHECK(hasEvent(events, Type::ModesChanged));
+    CHECK(link.modes()[1].thresholds.empty());
+
+    // Thresholds, from hosts since Data2G PR #186.
+    HostLink given({"ag7ew", true, false});
+    given.commandUp(0);
+    given.takeCommandOutput();
+    say(given, "OK\rOK\rWRONG\rOK\rOK\rBCAST PORT 2\rMODE qpsk-r1/3 1200 76 64 1.78 74.36\r"
+               "CHANNELS awgn mpg\rTHRESHOLD qpsk-r1/3 -4.5 -\rTHRESHOLD qpsk-r1/3 1\rOK\r", 100);
+    CHECK_EQ(given.modes().size(), (size_t)1);
+    CHECK(given.modes()[0].thresholds.size() == 2 && given.modes()[0].thresholds.at("awgn") == -4.5 &&
+          !given.modes()[0].thresholds.at("mpg"));
 
     // Not taking sessions, and the 500 Hz button.
     HostLink narrow({"W1AW", false, true});

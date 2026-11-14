@@ -148,6 +148,11 @@ and the Part 97 check.
   `BroadcastChat::answerRollCall`), unless in a ragchew or turned off in
   Settings; the row lists who answered. Net control's traffic round is
   Stage 2, still to build.
+- Data2G PR #186 (open 2026-11-14) puts mode_thresholds.json in the
+  `MODES` answer (`CHANNELS`, then `THRESHOLD name dB...` lines).
+  `HostLink` collects them into `ModeInfo::thresholds`, they win over the
+  files' in the gearshift (`HostMode::hasThresholds`), and the popup then
+  names data2g-host as the source and hides Load thresholds.
 - The dial, the path log and the watch list (2026-10-25,
   `docs/STAGE1.md`): `core/src/radio/` (`DialReader`, which only ever
   asks rigctld `\chk_vfo`, `f`, while transmitting the meters

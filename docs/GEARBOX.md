@@ -214,7 +214,10 @@ to or updating the one before:
    Its width and speed win over the file's: the speed is the payload rate
    from its airtimes, each codeword past the first adding
    (time at most codewords − time at one) / (most codewords − 1) seconds
-   for its bytes. Thresholds in `MODES`, once Andrew adds them, win too.
+   for its bytes. Thresholds in `MODES` (Data2G PR #186: `CHANNELS`,
+   then a `THRESHOLD` line per mode) win too, a `-` there taking away a
+   file's threshold. With them the popup names data2g-host as the source
+   and hides **Load thresholds...**, so no file is needed.
 
 With no thresholds found, the popup says where Ragtime looked. With
 Data2G's file but no host yet, it says the gears appear once data2g-host

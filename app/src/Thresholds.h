@@ -15,7 +15,8 @@
 //    /Gearshift/ThresholdsFile), else submode_thresholds.json in Ragtime's
 //    data folder.
 //
-// Widths and speeds then come from the host's MODES list.
+// Widths and speeds then come from the host's MODES list, and from hosts
+// since Data2G PR #186 the thresholds too, winning over the files'.
 
 // The file Ragtime looks for when none has been picked: submode_thresholds.json
 // in Ragtime's data folder, appDataDir() (~/.local/share/ragtime on Linux,
